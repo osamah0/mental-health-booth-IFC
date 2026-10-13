@@ -1,0 +1,928 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>قراراتك تصنع قصتك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;600;700&display=swap">
+<style>
+/* =========================================================
+   قراراتك تصنع قصتك — تجربة توعوية تفاعلية
+   Layout: عمود واحد في المنتصف (أقصى عرض 960px)، ترويسة فيها
+   مكان شعار النادي + شارة الفعالية، والشاشات تتبدل بانتقال هادئ.
+   ========================================================= */
+:root{
+  /* ---------- لوحة الألوان (عدّلها من هنا فقط) ---------- */
+  --bg:#F6F5F0;          /* أبيض دافئ للخلفية */
+  --surface:#FFFFFF;     /* البطاقات */
+  --surface-2:#EEF4F0;   /* خلفية خفيفة مخضرّة */
+  --ink:#1F2A26;         /* النص الأساسي (فحمي مخضر) */
+  --muted:#56635D;       /* النص الثانوي */
+  --line:#DCE3DE;        /* الحدود */
+  --green:#2E7D5B;       /* الأساسي: أخضر مريح */
+  --green-deep:#1E5A41;
+  --green-soft:#E2F0E8;
+  --teal:#1F7A7E;        /* المساعد: تركواز هادئ */
+  --teal-soft:#E1F0F0;
+  --lav:#6E66AE;         /* لمسة بنفسجية خفيفة للتنويهات */
+  --lav-soft:#EDEBF6;
+  --on-accent:#FFFFFF;
+  --logo-main:#316B7F;   /* لون الشعار الأساسي */
+  --logo-sub:#ADA797;
+  --shadow:0 1px 2px rgba(31,42,38,.06),0 10px 28px rgba(31,42,38,.07);
+  /* ---------- الخطوط ---------- */
+  --f-display:'Readex Pro','IBM Plex Sans Arabic',Tahoma,sans-serif;
+  --f-body:'IBM Plex Sans Arabic','Segoe UI',Tahoma,Arial,sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111916; --surface:#18221E; --surface-2:#1E2B25; --ink:#E7EEEA; --muted:#A2B1AA; --line:#2B3933;
+    --green:#5DBB8F; --green-deep:#8FD3B0; --green-soft:#1D3329; --teal:#5BBFC1; --teal-soft:#173033;
+    --lav:#ABA4E0; --lav-soft:#24223A; --on-accent:#0D1512; --logo-main:#8CC0D0; --logo-sub:#C9C3B4;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.28);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111916; --surface:#18221E; --surface-2:#1E2B25; --ink:#E7EEEA; --muted:#A2B1AA; --line:#2B3933;
+  --green:#5DBB8F; --green-deep:#8FD3B0; --green-soft:#1D3329; --teal:#5BBFC1; --teal-soft:#173033;
+  --lav:#ABA4E0; --lav-soft:#24223A; --on-accent:#0D1512; --logo-main:#8CC0D0; --logo-sub:#C9C3B4;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.28);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--f-body); font-size:17px; line-height:1.75;
+  padding-inline:16px; -webkit-font-smoothing:antialiased;
+}
+.app{max-width:960px; margin-inline:auto; min-height:100vh; display:flex; flex-direction:column; gap:8px; padding-block:12px 20px}
+h1,h2,h3{font-family:var(--f-display); line-height:1.35; margin:0; text-wrap:balance}
+p{margin:0}
+button{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--teal); outline-offset:3px; border-radius:10px}
+
+/* ---------- الترويسة ---------- */
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding-block:6px}
+.logo-slot{
+  /* مكان شعار نادي المؤسس — يُستبدل تلقائيًا عند تعبئة CONFIG.clubLogoSrc */
+  min-width:132px; height:52px; padding-inline:14px; border:1.5px dashed var(--line); border-radius:12px;
+  display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; text-align:center; line-height:1.3;
+}
+.logo-slot img{max-height:48px; width:auto; display:block}
+.logo-slot.has-img{border:0; padding:0; height:auto; min-width:0}
+.club-logo{height:clamp(64px,10vw,84px); width:auto; display:block}
+.club-logo .lg-main{fill:var(--logo-main)} .club-logo .lg-sub{fill:var(--logo-sub)}
+.event-badge{display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:var(--green-deep);
+  background:var(--green-soft); padding:8px 14px; border-radius:999px}
+.event-badge svg{flex:none}
+.event-badge img{max-height:34px}
+
+/* ---------- الشاشات ---------- */
+main{flex:1}
+.screen{display:flex; flex-direction:column; gap:20px; padding-block:12px 8px}
+.screen.enter{animation:enter .45s ease both}
+@keyframes enter{from{opacity:.0; transform:translateY(10px)}to{opacity:1; transform:none}}
+
+/* ---------- الأزرار ---------- */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; border:0; cursor:pointer;
+  border-radius:14px; padding:14px 26px; font-weight:600; font-size:17px; transition:transform .2s, background .2s, box-shadow .2s}
+.btn-primary{background:var(--green); color:var(--on-accent); box-shadow:var(--shadow)}
+.btn-primary:hover{background:var(--green-deep); transform:translateY(-1px)}
+.btn-ghost{background:transparent; color:var(--green-deep); border:1.5px solid var(--line)}
+.btn-ghost:hover{border-color:var(--green); background:var(--surface-2)}
+.btn-lg{padding:18px 34px; font-size:19px}
+.btn-row{display:flex; flex-wrap:wrap; gap:10px}
+
+/* ---------- الصفحة الافتتاحية ---------- */
+.hero{display:grid; grid-template-columns:1.3fr 1fr; gap:28px; align-items:center; padding-block:16px}
+.hero-text{display:flex; flex-direction:column; gap:16px; min-width:0}
+.eyebrow{font-size:14px; font-weight:600; color:var(--teal); letter-spacing:.02em}
+.hero h1{font-size:clamp(2.3rem,6.5vw,4rem); font-weight:700; color:var(--ink)}
+.hero h1 em{font-style:normal; color:var(--green)}
+.lead{font-size:clamp(1.05rem,2.4vw,1.2rem); color:var(--muted); max-width:34ch}
+.facts{display:flex; flex-wrap:wrap; gap:8px; padding:0; margin:0; list-style:none}
+.facts li{font-size:14px; padding:6px 12px; border-radius:999px; background:var(--surface); border:1px solid var(--line); color:var(--muted)}
+.facts b{color:var(--ink); font-weight:600}
+.hero-art{display:flex; justify-content:center}
+.hero-art svg{width:100%; max-width:320px; height:auto}
+.hero-art .p{fill:none; stroke-width:5; stroke-linecap:round}
+.hero-art .p1{stroke:var(--green)} .hero-art .p2{stroke:var(--teal)} .hero-art .p3{stroke:var(--lav)}
+.hero-art .trunk{stroke:var(--ink); opacity:.75}
+.hero-art .dot{stroke:var(--surface); stroke-width:4}
+.draw{stroke-dasharray:400; stroke-dashoffset:400; animation:draw 1.6s .2s ease forwards}
+.draw.d2{animation-delay:.45s} .draw.d3{animation-delay:.7s}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+.notice{display:flex; gap:12px; align-items:flex-start; background:var(--lav-soft); color:var(--ink);
+  border-radius:14px; padding:14px 16px; font-size:15px; line-height:1.7}
+.notice svg{flex:none; margin-top:3px; color:var(--lav)}
+.notice b{color:var(--lav)}
+
+/* ---------- اختيار المسار ---------- */
+.section-head{display:flex; flex-direction:column; gap:6px}
+.section-head h2{font-size:clamp(1.6rem,4vw,2.2rem)}
+.section-head p{color:var(--muted)}
+.paths{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px}
+.path-card{position:relative; display:flex; flex-direction:column; gap:12px; text-align:right; cursor:pointer;
+  background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r); padding:22px; box-shadow:var(--shadow);
+  transition:transform .25s, border-color .25s}
+.path-card:hover{transform:translateY(-3px); border-color:var(--green)}
+.path-icon{width:54px; height:54px; border-radius:16px; display:grid; place-items:center}
+.path-card[data-tone="green"] .path-icon{background:var(--green-soft); color:var(--green)}
+.path-card[data-tone="teal"] .path-icon{background:var(--teal-soft); color:var(--teal)}
+.path-card[data-tone="lav"] .path-icon{background:var(--lav-soft); color:var(--lav)}
+.path-card h3{font-size:1.35rem}
+.path-card p{color:var(--muted); font-size:15.5px; flex:1}
+.path-card .go{font-weight:600; color:var(--green-deep); display:flex; align-items:center; gap:6px}
+.done-chip{position:absolute; top:16px; left:16px; font-size:12.5px; font-weight:600; padding:3px 10px; border-radius:999px;
+  background:var(--green-soft); color:var(--green-deep)}
+.overall-cta{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;
+  background:var(--teal-soft); border-radius:var(--r); padding:16px 20px}
+.overall-cta p{font-weight:500}
+
+/* ---------- الموقف ---------- */
+.scene-top{display:flex; flex-direction:column; gap:10px}
+.scene-meta{display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:14px; color:var(--muted)}
+.path-chip{font-weight:600; color:var(--teal)}
+.progress{height:8px; background:var(--line); border-radius:999px; overflow:hidden}
+.progress span{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--teal),var(--green)); border-radius:inherit; transition:width .5s ease}
+.scene-card{background:var(--surface); border-radius:var(--r); padding:clamp(18px,4vw,30px); box-shadow:var(--shadow); display:flex; flex-direction:column; gap:16px}
+.scene-card h2{font-size:clamp(1.45rem,3.6vw,1.9rem)}
+.bridge{font-size:15px; color:var(--teal); background:var(--teal-soft); border-radius:10px; padding:6px 12px; align-self:flex-start}
+.situation{font-size:clamp(1.08rem,2.5vw,1.22rem); max-width:60ch}
+.options{display:flex; flex-direction:column; gap:10px}
+.opt{display:flex; align-items:center; gap:14px; text-align:right; width:100%; cursor:pointer;
+  background:var(--bg); border:1.5px solid var(--line); border-radius:14px; padding:14px 16px; font-size:16.5px; line-height:1.6;
+  transition:border-color .2s, background .2s, transform .2s, opacity .3s}
+.opt:hover:not(:disabled){border-color:var(--green); background:var(--surface-2); transform:translateY(-1px)}
+.opt .k{flex:none; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-weight:700;
+  background:var(--surface); border:1.5px solid var(--line); color:var(--green-deep); font-family:var(--f-display)}
+.opt:disabled{cursor:default}
+.opt.chosen{border-color:var(--green); background:var(--green-soft)}
+.opt.chosen .k{background:var(--green); border-color:var(--green); color:var(--on-accent)}
+.opt.dim{opacity:.5}
+.feedback{display:flex; flex-direction:column; gap:12px; border-top:1px dashed var(--line); padding-top:16px}
+.feedback.enter{animation:enter .4s ease both}
+.fb-label{font-size:13px; font-weight:600; color:var(--muted); letter-spacing:.02em}
+.fb-outcome{font-size:1.08rem; font-weight:500}
+.fb-reflect{display:flex; flex-direction:column; gap:6px; background:var(--surface-2); border-radius:12px; padding:12px 14px}
+.axis-chip{align-self:flex-start; font-size:13px; font-weight:600; padding:2px 10px; border-radius:999px; background:var(--green); color:var(--on-accent)}
+.feedback .btn{align-self:flex-start}
+
+/* ---------- بطاقة النتيجة ---------- */
+.result-card{background:var(--surface); border-radius:22px; overflow:hidden; box-shadow:var(--shadow); border:1px solid var(--line)}
+.rc-head{background:linear-gradient(135deg,#1E5A41,#1F7A7E); color:#FFFFFF; padding:24px clamp(18px,4vw,32px); display:flex; flex-direction:column; gap:4px}
+.rc-head small{opacity:.85; font-size:14px}
+.rc-head h2{font-size:clamp(1.5rem,4vw,2rem)}
+.rc-body{padding:clamp(18px,4vw,32px); display:grid; gap:20px}
+.rc-summary{font-size:clamp(1.08rem,2.6vw,1.25rem); font-weight:500; max-width:60ch}
+.rc-summary span{display:block; font-weight:400; color:var(--muted); font-size:.92em; margin-top:4px}
+.rc-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px}
+.rc-block{display:flex; flex-direction:column; gap:8px; min-width:0}
+.rc-block h3{font-size:1rem; color:var(--green-deep); font-family:var(--f-body); font-weight:700}
+.rc-block ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px}
+.rc-block li{position:relative; padding-right:18px}
+.rc-block li::before{content:""; position:absolute; right:0; top:.75em; width:8px; height:8px; border-radius:50%; background:var(--green)}
+.rc-block.reflect li::before{background:var(--teal)}
+.rc-tip{background:var(--green-soft); border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:4px}
+.rc-tip b{color:var(--green-deep)}
+.rc-ending{font-size:15px; color:var(--muted); border-right:3px solid var(--teal); padding-right:12px}
+.bars{display:flex; flex-direction:column; gap:8px}
+.bar{display:grid; grid-template-columns:120px 1fr; align-items:center; gap:10px; font-size:14px}
+.bar .track{height:10px; background:var(--surface-2); border-radius:999px; overflow:hidden}
+.bar .fill{height:100%; background:linear-gradient(90deg,var(--teal),var(--green)); border-radius:inherit; transition:width .8s ease}
+.bars-note{font-size:13px; color:var(--muted)}
+.rc-disclaimer{font-size:13.5px; color:var(--muted); border-top:1px solid var(--line); padding-top:12px}
+.overall-rows{display:flex; flex-direction:column; gap:8px}
+.overall-row{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+  background:var(--surface-2); border-radius:12px; padding:10px 14px}
+.overall-row .axis-chip{align-self:center}
+
+/* ---------- نافذة الصورة ---------- */
+.modal{position:fixed; inset:0; background:rgba(10,18,15,.72); display:flex; align-items:center; justify-content:center; padding:16px; z-index:20}
+.modal-box{background:var(--surface); border-radius:18px; padding:16px; max-width:460px; width:100%; max-height:92vh; overflow:auto; display:flex; flex-direction:column; gap:12px}
+.modal-box img{border-radius:12px; border:1px solid var(--line); width:100%}
+.modal-box p{font-size:14.5px; color:var(--muted)}
+
+/* ---------- التذييل ---------- */
+.foot{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px; color:var(--muted);
+  border-top:1px solid var(--line); padding-top:12px}
+.linkbtn{background:none; border:0; color:var(--teal); font-weight:600; cursor:pointer; padding:4px 0; font-size:13px}
+
+@media (max-width:720px){
+  .hero{grid-template-columns:1fr; gap:8px}
+  .hero-art{order:-1}
+  .hero-art svg{max-width:200px}
+  .bar{grid-template-columns:100px 1fr}
+}
+/* وضع الآيباد / شاشة البوث: خط أكبر قليلًا */
+@media (min-width:768px) and (pointer:coarse){ body{font-size:18px} .opt{padding:18px 20px; font-size:18px} }
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important; transition:none!important}
+  .draw{stroke-dashoffset:0}
+}
+</style>
+
+<div class="app" dir="rtl" lang="ar">
+  <!-- ================= الترويسة ================= -->
+  <header class="topbar">
+    <!-- شعار نادي المؤسس الرسمي (SVG متجه، لونه من --logo-main و --logo-sub) -->
+    <div class="logo-slot has-img" id="clubLogo"><svg class="club-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 455 498" role="img" aria-label="شعار نادي المؤسس للابتكار والاستثمار"><path class="lg-main" fill-rule="evenodd" d="M327.9 432.0 L326.1 432.6 L324.8 433.9 L323.9 435.6 L323.6 437.1 L323.9 438.4 L324.5 439.6 L325.6 440.9 L326.6 441.5 L328.6 441.9 L330.6 441.2 L332.1 439.9 L332.8 438.6 L333.0 436.9 L332.6 435.0 L331.4 433.1 L329.4 432.1Z M316.6 432.0 L314.6 432.8 L313.4 434.0 L312.6 435.6 L312.5 437.6 L312.9 439.0 L313.9 440.5 L315.4 441.5 L317.6 441.9 L318.6 441.6 L320.4 440.5 L321.5 438.6 L321.9 436.5 L321.0 434.2 L319.6 432.8 L318.2 432.1Z M378.6 385.5 L378.1 386.5 L378.0 389.5 L378.2 391.5 L378.8 392.2 L379.6 392.6 L392.6 392.8 L394.0 393.2 L395.5 394.9 L396.1 397.2 L396.1 415.4 L395.8 416.5 L395.1 417.1 L394.1 417.5 L379.9 417.5 L378.8 417.9 L378.2 418.6 L378.0 419.6 L378.0 422.9 L378.4 424.4 L379.8 425.1 L405.2 425.1 L406.4 424.8 L406.9 424.1 L407.1 423.2 L407.1 396.4 L406.6 393.4 L405.1 390.1 L402.5 387.4 L399.6 385.8 L398.4 385.4 L394.8 385.0 L380.0 385.0Z M295.2 386.1 L295.0 387.2 L295.0 413.2 L295.2 415.5 L295.8 417.2 L296.5 418.8 L298.2 421.4 L300.0 423.0 L302.2 424.2 L304.5 424.9 L306.8 425.1 L346.2 425.1 L347.5 424.9 L348.1 424.4 L348.5 423.5 L348.6 396.6 L349.5 394.4 L350.8 393.2 L351.9 392.9 L353.4 392.9 L355.0 393.6 L355.9 394.6 L356.5 396.1 L356.8 400.6 L356.6 414.0 L356.8 415.6 L357.1 416.5 L357.6 417.0 L358.9 417.4 L365.6 417.4 L366.9 417.0 L367.5 416.2 L367.8 415.2 L367.8 396.9 L367.4 394.0 L366.5 391.6 L364.9 389.2 L362.6 387.1 L360.1 385.8 L358.4 385.2 L354.2 385.0 L347.0 385.2 L345.2 385.8 L343.1 386.8 L342.2 387.4 L340.0 389.8 L338.2 392.9 L337.5 396.4 L337.4 415.9 L336.6 417.0 L335.1 417.5 L310.4 417.5 L309.0 417.2 L307.9 416.8 L307.1 416.0 L306.5 414.9 L306.0 412.1 L305.9 386.4 L305.1 385.4 L302.4 385.0 L296.5 385.1 L295.9 385.4Z M6.0 395.0 L6.0 430.4 L6.4 433.1 L7.6 436.2 L10.0 439.1 L13.1 441.1 L15.9 441.9 L44.5 441.9 L45.2 441.4 L45.8 439.5 L45.8 426.8 L46.0 426.1 L46.8 425.4 L47.4 425.1 L50.5 425.0 L53.8 424.1 L55.6 423.1 L57.4 421.6 L58.6 421.0 L59.8 421.2 L61.9 423.0 L64.1 424.2 L66.8 425.0 L72.8 425.0 L75.6 424.2 L79.0 422.6 L80.0 422.6 L82.6 424.0 L84.9 424.8 L87.6 425.1 L91.6 425.1 L96.4 424.4 L99.4 422.8 L100.5 422.5 L101.5 422.8 L104.2 424.2 L106.0 424.8 L109.0 425.1 L111.4 425.1 L113.6 424.9 L115.6 424.2 L117.8 423.1 L119.9 421.4 L120.8 421.0 L121.4 421.0 L122.4 421.5 L125.1 423.6 L127.1 424.5 L130.8 425.1 L134.5 425.1 L136.6 424.8 L138.8 424.0 L141.5 422.1 L142.9 420.8 L144.0 419.1 L144.8 417.5 L145.1 415.9 L145.5 412.8 L145.5 387.2 L145.1 386.0 L144.2 385.2 L136.1 385.1 L135.4 385.4 L134.6 386.2 L134.4 387.5 L134.4 412.9 L133.9 415.1 L133.1 416.2 L132.4 416.9 L130.9 417.4 L129.6 417.2 L128.4 416.6 L127.5 415.6 L126.9 413.9 L126.6 410.8 L126.8 387.4 L126.5 386.1 L125.9 385.4 L124.1 385.0 L117.4 385.1 L116.6 385.4 L115.9 386.2 L115.6 387.5 L115.5 413.8 L114.8 415.8 L114.0 416.6 L112.6 417.2 L110.9 417.2 L109.6 416.6 L108.8 415.6 L108.1 414.2 L107.9 412.5 L107.9 386.8 L107.6 385.9 L107.0 385.2 L105.6 385.0 L99.8 385.0 L97.9 385.2 L97.1 386.0 L96.9 386.9 L96.9 412.6 L96.6 414.0 L95.8 415.9 L95.0 416.6 L94.0 417.1 L92.9 417.4 L87.8 417.4 L85.4 416.6 L84.2 415.5 L83.4 413.0 L83.2 387.0 L82.9 385.9 L82.4 385.4 L80.5 385.0 L74.9 385.0 L73.5 385.2 L72.5 386.1 L72.2 387.1 L72.1 413.8 L71.4 415.8 L70.4 416.8 L69.2 417.2 L67.8 417.2 L66.2 416.6 L65.1 415.2 L64.6 413.2 L64.4 386.4 L63.8 385.5 L62.9 385.1 L55.1 385.1 L54.2 385.5 L53.9 385.9 L53.5 387.0 L53.5 411.1 L53.2 414.1 L52.8 415.5 L51.8 416.6 L50.4 417.2 L48.6 417.2 L47.2 416.5 L46.5 415.6 L46.0 414.4 L45.8 412.8 L45.8 387.8 L45.5 386.2 L45.0 385.5 L44.1 385.1 L37.5 385.1 L36.5 385.5 L36.0 386.0 L35.8 386.8 L35.8 432.1 L35.5 433.1 L34.9 433.9 L33.8 434.4 L21.0 434.4 L18.9 433.6 L18.1 432.9 L17.4 431.4 L17.1 430.2 L16.9 394.0 L16.0 393.0 L14.9 392.8 L8.0 392.8 L6.9 393.1 L6.4 393.6Z M442.8 368.5 L441.4 369.1 L439.9 370.8 L439.2 372.2 L439.2 374.4 L439.8 375.8 L441.1 377.4 L442.8 378.1 L444.6 378.2 L446.8 377.2 L447.8 376.0 L448.4 374.1 L448.4 372.4 L447.6 370.5 L446.4 369.2 L444.6 368.5Z M179.8 365.2 L178.8 364.9 L177.2 364.9 L175.2 365.2 L173.2 366.2 L171.9 367.6 L170.6 370.1 L170.0 373.5 L169.1 374.4 L167.9 375.0 L167.5 375.5 L167.4 377.1 L168.1 378.1 L169.4 378.5 L178.0 378.5 L179.2 378.2 L180.1 377.6 L180.4 377.1 L180.4 376.0 L179.8 375.0 L178.9 374.6 L176.1 374.5 L174.9 373.6 L174.5 372.8 L174.8 370.8 L175.9 369.4 L176.8 369.0 L179.0 368.8 L180.1 368.0 L180.4 367.5 L180.4 366.1Z M418.0 358.2 L417.4 358.9 L417.0 360.2 L417.0 413.8 L417.6 417.0 L419.1 420.0 L421.5 422.5 L422.9 423.5 L425.6 424.6 L429.0 425.1 L438.4 425.1 L441.1 424.5 L443.6 423.4 L445.1 422.2 L446.9 420.5 L448.0 418.8 L448.8 416.9 L449.1 412.1 L449.1 387.5 L448.9 386.1 L448.2 385.4 L447.6 385.1 L439.9 385.1 L439.4 385.2 L438.6 385.9 L438.2 387.0 L438.2 412.5 L438.0 414.2 L437.4 415.6 L436.4 416.6 L435.2 417.1 L431.6 417.2 L430.0 416.6 L429.0 415.6 L428.5 414.8 L428.1 413.4 L428.0 411.2 L428.0 359.8 L427.5 358.6 L426.6 358.1 L425.9 358.0 L418.9 358.0Z M258.9 358.0 L258.0 358.2 L257.4 358.9 L257.0 360.2 L257.0 423.1 L257.4 424.4 L258.4 425.0 L266.1 425.1 L267.2 424.8 L268.0 423.6 L268.0 359.8 L267.5 358.6 L266.6 358.1Z M246.4 358.4 L245.1 358.0 L238.2 358.0 L236.9 358.5 L236.2 359.8 L236.2 410.9 L235.8 414.8 L235.2 415.8 L234.4 416.6 L233.6 417.0 L231.6 417.4 L228.8 417.2 L227.2 416.6 L226.0 415.2 L225.5 413.9 L225.2 411.5 L225.2 396.0 L224.9 393.9 L224.1 391.8 L222.9 389.6 L220.5 387.4 L217.9 385.9 L214.9 385.1 L205.2 385.1 L203.0 385.6 L201.5 386.2 L199.4 387.8 L198.0 389.1 L196.2 391.8 L195.2 395.0 L195.1 412.1 L194.9 414.1 L194.5 415.2 L193.2 416.6 L191.1 417.4 L187.8 417.4 L187.1 417.1 L186.5 416.5 L186.2 415.9 L186.1 386.8 L185.4 385.5 L184.5 385.1 L165.8 385.2 L163.4 385.9 L161.9 386.6 L159.1 388.9 L157.8 390.6 L157.0 392.1 L156.1 395.2 L156.0 413.1 L156.4 416.1 L157.0 418.0 L158.2 420.2 L160.1 422.2 L161.6 423.4 L164.8 424.8 L166.9 425.1 L173.2 425.1 L174.2 425.5 L174.8 426.0 L175.1 426.9 L175.0 430.8 L174.1 432.6 L173.0 433.8 L172.2 434.1 L168.5 434.5 L168.0 434.8 L167.2 435.8 L167.1 440.0 L167.2 440.8 L167.9 441.6 L168.9 442.0 L176.2 441.9 L179.0 441.1 L181.5 439.6 L183.9 437.2 L185.2 434.9 L186.0 432.0 L186.2 426.9 L186.5 426.1 L187.6 425.2 L195.5 424.8 L196.9 425.9 L198.0 427.5 L200.6 429.9 L202.6 430.9 L204.6 431.5 L206.6 431.8 L214.2 431.8 L216.5 431.4 L219.9 429.9 L222.6 427.4 L223.6 425.9 L224.9 424.8 L226.1 424.6 L229.2 425.1 L235.6 425.1 L238.4 424.8 L241.6 423.4 L243.0 422.4 L244.6 420.8 L245.5 419.5 L246.8 416.9 L247.2 413.2 L247.2 360.4 L247.1 359.5Z M209.4 392.9 L211.4 393.0 L213.0 394.0 L213.9 395.5 L214.2 398.0 L214.2 419.2 L214.0 420.9 L213.4 422.4 L212.4 423.4 L211.0 424.0 L209.4 424.0 L208.6 423.8 L207.1 422.5 L206.5 421.1 L206.1 419.0 L206.2 396.6 L207.0 394.5 L208.1 393.4Z M172.4 392.8 L173.5 392.8 L174.1 393.0 L174.8 393.6 L175.1 394.8 L175.1 415.5 L174.9 416.4 L174.1 417.1 L173.5 417.4 L170.8 417.2 L168.9 416.4 L167.5 414.5 L167.0 411.6 L167.0 399.1 L167.2 396.6 L167.9 395.1 L169.1 393.8 L170.4 393.1Z M247.8 114.5 L246.8 114.1 L225.9 114.1 L218.4 114.8 L214.4 115.5 L209.6 117.2 L205.6 119.6 L202.8 122.2 L200.9 124.8 L199.0 128.5 L197.9 132.5 L197.2 138.2 L197.9 144.4 L198.6 147.8 L199.6 150.9 L201.8 155.8 L201.9 156.6 L201.6 157.2 L200.8 157.9 L191.2 158.0 L190.2 158.5 L189.6 160.0 L189.6 172.5 L190.2 174.0 L191.2 174.5 L192.6 174.6 L246.1 174.6 L247.0 174.5 L248.0 174.0 L248.4 173.4 L248.6 172.1 L248.5 159.5 L247.9 158.4 L247.0 158.0 L225.2 158.0 L223.1 157.6 L222.0 156.9 L220.4 155.0 L217.2 150.2 L215.0 144.9 L214.5 141.8 L214.6 138.5 L215.4 135.9 L217.0 134.0 L220.0 132.4 L224.2 131.6 L246.9 131.5 L247.8 131.1 L248.4 130.4 L248.6 128.9 L248.6 116.6 L248.4 115.4Z M177.6 6.5 L176.1 6.4 L173.8 6.6 L146.4 16.2 L143.0 17.6 L140.9 19.0 L139.4 20.5 L138.1 22.4 L137.2 24.6 L136.9 26.6 L136.9 28.6 L137.5 31.4 L140.9 40.8 L142.0 44.8 L142.0 47.9 L141.8 49.1 L141.0 51.1 L139.8 53.1 L137.4 55.5 L130.2 61.5 L124.6 67.2 L118.0 75.1 L112.2 83.6 L110.8 85.0 L108.8 85.0 L94.8 80.1 L88.9 78.4 L86.6 78.2 L84.8 78.5 L81.2 80.0 L79.5 81.4 L77.6 83.8 L76.6 86.0 L67.5 112.6 L66.5 116.8 L66.6 119.2 L67.4 122.0 L68.2 123.6 L70.4 126.0 L72.4 127.4 L74.2 128.2 L87.0 132.5 L89.2 133.5 L90.8 134.5 L92.6 136.4 L93.9 138.5 L94.6 140.5 L95.0 142.5 L95.1 149.1 L95.9 157.4 L97.2 165.8 L99.6 175.8 L99.6 177.9 L99.2 179.9 L98.0 182.6 L97.1 183.9 L95.5 185.5 L82.0 194.2 L79.4 196.6 L78.2 198.2 L77.5 199.9 L77.0 202.1 L77.0 204.9 L77.4 206.6 L78.5 209.4 L92.0 230.6 L96.9 236.2 L99.6 238.0 L102.2 238.8 L104.5 238.9 L106.2 238.6 L108.0 238.1 L109.9 237.2 L110.9 237.2 L111.6 238.1 L111.8 285.4 L112.0 290.0 L112.5 291.0 L115.2 293.4 L125.4 300.2 L138.4 307.6 L148.6 312.6 L149.5 312.6 L150.1 312.1 L150.5 310.4 L150.5 232.6 L151.1 231.5 L152.2 231.4 L154.9 232.6 L165.5 239.9 L173.9 244.6 L182.9 248.8 L186.1 250.0 L195.8 253.0 L205.5 255.2 L212.6 256.1 L219.0 256.5 L220.1 255.8 L220.4 255.0 L220.5 221.8 L220.4 220.5 L220.0 219.6 L219.6 219.2 L218.4 218.8 L212.8 218.1 L207.5 217.1 L196.8 213.6 L190.2 210.4 L183.5 206.4 L178.2 202.6 L174.4 199.4 L169.5 194.1 L165.5 189.2 L161.2 183.1 L158.9 179.0 L157.2 175.8 L154.9 169.8 L153.2 164.8 L151.5 157.0 L150.5 148.5 L150.5 140.0 L151.2 132.9 L152.4 127.1 L154.8 119.1 L158.0 111.2 L161.8 104.6 L165.9 98.8 L172.1 91.4 L175.0 88.6 L181.1 83.8 L191.1 77.6 L197.2 74.8 L205.4 72.0 L212.1 70.5 L218.6 69.8 L219.5 69.4 L220.0 68.9 L220.4 68.0 L220.5 37.1 L220.4 32.5 L220.0 31.6 L218.8 31.0 L214.6 31.1 L206.9 32.1 L201.1 33.2 L199.0 33.2 L197.2 32.6 L195.2 31.2 L193.2 29.2 L191.5 26.8 L190.0 23.8 L186.9 14.8 L185.0 11.0 L182.9 8.8 L180.5 7.4Z"/><path class="lg-sub" fill-rule="evenodd" d="M344.9 486.8 L343.9 487.5 L343.6 489.0 L344.2 490.0 L345.1 490.4 L346.1 490.2 L347.0 489.4 L347.0 487.8 L346.1 486.9Z M280.8 465.1 L278.9 465.2 L278.0 466.0 L277.8 466.6 L277.5 485.0 L277.0 487.1 L275.8 488.8 L274.8 489.4 L272.1 490.2 L272.1 490.8 L272.5 491.1 L273.9 491.8 L276.4 491.8 L278.9 490.6 L280.8 488.6 L281.8 486.2 L282.2 482.1 L282.2 468.5 L282.0 466.2 L281.1 465.2Z M84.8 465.1 L82.8 465.2 L81.8 466.4 L81.6 484.1 L81.4 485.8 L80.8 487.5 L79.8 488.8 L78.5 489.5 L76.6 489.9 L76.0 490.2 L76.0 490.6 L76.5 491.1 L77.5 491.6 L79.6 491.9 L81.2 491.5 L82.5 490.9 L83.9 489.8 L85.5 486.6 L86.1 483.4 L86.1 466.6 L85.8 465.8Z M259.2 465.1 L255.0 465.0 L251.4 465.5 L249.8 466.0 L248.1 466.9 L246.4 468.5 L244.9 470.6 L244.2 472.1 L243.6 474.5 L243.6 476.5 L244.0 478.9 L245.0 482.1 L245.9 482.9 L247.1 483.1 L254.6 483.1 L255.2 483.4 L256.0 484.2 L256.1 485.6 L255.8 487.0 L254.5 488.6 L253.4 489.2 L250.5 489.9 L249.5 490.4 L249.5 490.8 L249.9 491.1 L251.1 491.6 L254.4 491.8 L257.1 490.6 L258.8 489.1 L260.4 486.0 L260.9 481.8 L260.9 467.0 L260.5 466.0 L259.9 465.4Z M255.0 468.2 L256.0 469.1 L256.4 470.4 L256.4 476.4 L256.1 478.6 L255.5 479.5 L254.1 480.0 L251.2 480.0 L249.9 479.8 L248.9 479.0 L248.2 477.1 L248.2 473.6 L248.6 471.9 L249.6 470.2 L251.2 468.9 L253.0 468.2Z M128.2 456.2 L127.2 456.9 L127.0 457.5 L127.0 458.5 L127.8 459.6 L128.2 459.9 L129.2 459.9 L130.0 459.5 L130.5 458.8 L130.5 457.2 L129.5 456.4Z M152.8 456.2 L151.9 457.1 L151.8 458.2 L152.5 459.4 L153.4 459.8 L154.4 459.6 L155.2 458.6 L155.2 457.0 L154.2 456.1Z M332.2 456.0 L331.6 456.2 L331.0 456.9 L330.8 457.4 L330.8 458.4 L331.5 459.4 L332.9 459.8 L333.4 459.6 L334.1 459.0 L334.4 458.5 L334.4 457.2 L333.6 456.2Z M325.8 456.0 L324.8 456.4 L324.2 456.9 L324.0 458.0 L324.6 459.2 L325.6 459.8 L326.4 459.8 L327.5 459.0 L327.9 457.8 L327.1 456.4Z M146.8 456.0 L146.0 456.2 L145.4 456.9 L145.1 458.0 L145.8 459.4 L146.5 459.8 L147.4 459.8 L148.4 459.1 L148.8 457.6 L148.5 456.9 L147.9 456.2Z M135.9 456.1 L135.0 457.0 L134.9 458.4 L135.2 459.1 L135.9 459.6 L137.4 459.6 L138.2 458.8 L138.4 457.2 L138.1 456.8 L137.2 456.1Z M132.4 451.1 L131.4 451.6 L131.0 452.1 L130.9 453.5 L131.8 454.8 L132.2 455.0 L133.2 455.0 L134.2 454.2 L134.5 453.6 L134.5 452.5 L133.6 451.4Z M235.8 451.0 L234.6 451.9 L234.4 452.6 L234.4 481.9 L235.0 482.8 L236.9 483.1 L237.9 482.9 L238.5 482.2 L238.8 481.2 L238.8 452.9 L238.0 451.4 L237.2 451.0Z M394.4 451.8 L393.8 451.1 L392.0 450.9 L391.0 451.2 L390.2 452.5 L390.1 477.8 L389.8 479.0 L389.0 479.8 L386.1 479.9 L382.5 479.6 L381.4 479.1 L380.8 478.1 L380.1 475.2 L380.1 453.4 L379.6 451.8 L378.6 451.0 L377.6 450.9 L376.8 451.1 L376.1 451.6 L375.6 453.1 L375.6 477.2 L375.0 478.8 L374.1 479.5 L373.0 479.9 L369.2 479.9 L368.6 479.6 L367.8 478.5 L367.5 477.5 L367.5 460.8 L367.2 459.9 L366.8 459.2 L365.1 458.8 L364.1 459.0 L363.5 459.5 L363.0 461.2 L363.0 477.9 L362.8 478.8 L362.2 479.5 L361.0 480.0 L356.4 479.9 L354.6 480.1 L353.8 481.1 L353.8 482.0 L354.0 482.5 L354.9 483.0 L357.2 483.1 L375.2 483.0 L377.1 482.5 L378.0 482.0 L379.6 480.5 L380.5 480.4 L382.8 482.2 L384.2 483.0 L392.4 483.1 L394.0 482.6 L394.6 481.5 L394.8 480.1 L394.8 452.9Z M289.8 451.8 L289.2 453.2 L289.4 481.5 L289.9 482.5 L291.1 483.1 L310.9 483.0 L312.1 482.8 L313.5 482.1 L315.6 480.4 L316.5 480.5 L318.6 482.5 L319.4 482.9 L321.0 483.1 L326.9 483.1 L328.0 482.9 L330.0 482.0 L331.9 480.2 L332.9 480.4 L334.6 482.1 L336.6 483.0 L346.9 483.0 L347.9 482.2 L348.2 480.9 L348.2 466.8 L347.8 465.6 L346.8 465.1 L345.4 465.1 L344.5 465.5 L343.9 466.6 L343.9 477.5 L343.4 479.1 L342.6 479.8 L341.6 480.0 L335.6 479.9 L333.8 479.5 L333.0 478.9 L332.1 475.1 L332.1 467.0 L331.8 465.9 L330.5 465.1 L329.0 465.1 L328.1 465.8 L327.8 466.5 L327.6 477.2 L327.1 478.8 L326.4 479.5 L325.4 479.9 L319.4 479.8 L317.5 479.1 L316.6 478.1 L316.2 477.1 L315.6 470.6 L314.9 467.9 L312.6 465.1 L310.2 464.0 L307.8 463.4 L306.6 462.4 L306.6 461.8 L307.0 460.9 L311.6 453.2 L311.4 451.9 L310.0 450.9 L308.6 451.0 L307.5 452.1 L303.1 459.4 L300.8 463.0 L300.5 464.6 L300.8 465.4 L301.9 466.1 L306.4 466.2 L307.2 466.5 L308.9 467.4 L310.2 468.8 L311.0 470.5 L311.4 473.2 L311.2 477.6 L310.9 478.8 L309.9 479.6 L308.0 480.0 L295.5 479.9 L294.6 479.5 L294.0 478.8 L293.8 477.8 L293.8 452.6 L293.4 451.8 L292.4 451.0 L290.9 451.0Z M226.2 451.2 L225.4 450.9 L223.9 451.0 L222.9 452.0 L222.6 453.0 L222.6 477.6 L222.1 479.1 L221.2 479.8 L220.2 480.0 L216.6 480.0 L215.5 479.6 L214.8 478.8 L214.5 477.8 L214.5 460.8 L214.1 459.6 L213.6 459.1 L212.0 458.8 L211.4 458.9 L210.5 459.5 L210.0 461.4 L210.1 477.4 L209.8 478.9 L209.0 479.6 L207.9 480.0 L201.9 480.0 L201.4 480.2 L200.8 481.1 L200.8 482.1 L201.2 482.8 L202.8 483.1 L223.9 483.1 L225.6 483.0 L226.8 482.2 L227.1 480.4 L227.1 453.5 L226.9 452.1Z M92.5 452.2 L92.2 453.6 L92.2 479.6 L92.5 482.0 L93.1 482.8 L93.9 483.0 L130.8 483.1 L131.8 483.0 L133.6 482.2 L135.5 480.5 L136.2 480.1 L136.8 480.1 L139.0 482.5 L140.0 482.9 L142.1 483.1 L147.2 483.1 L149.6 482.8 L151.1 482.0 L153.1 480.2 L154.0 480.4 L154.8 481.5 L155.8 482.4 L158.4 483.1 L166.1 483.0 L168.1 482.2 L170.0 480.6 L170.6 480.4 L171.4 480.5 L173.4 482.4 L176.0 483.1 L177.4 483.1 L180.0 482.5 L183.1 480.4 L184.0 480.5 L186.0 482.5 L187.9 483.0 L193.8 483.0 L194.4 482.8 L195.1 481.9 L195.4 478.6 L195.4 467.0 L195.0 466.0 L194.5 465.5 L193.5 465.1 L191.8 465.4 L191.0 466.5 L190.8 478.4 L190.0 479.5 L189.1 479.9 L187.1 479.9 L184.8 479.2 L184.0 478.4 L183.5 477.0 L183.1 474.9 L183.0 469.1 L182.4 468.1 L181.5 467.8 L180.0 467.9 L179.0 468.8 L178.8 469.6 L178.6 477.5 L178.2 478.5 L176.8 479.8 L173.5 479.8 L172.2 479.2 L171.6 478.6 L170.8 476.0 L170.5 471.9 L170.1 471.0 L169.1 470.4 L167.1 470.5 L166.6 470.9 L166.2 471.6 L166.0 477.8 L165.6 478.8 L164.9 479.5 L163.6 479.9 L157.1 479.9 L154.9 479.5 L154.2 479.1 L153.9 478.4 L153.1 475.1 L153.0 466.8 L152.8 466.0 L152.1 465.4 L151.5 465.1 L150.4 465.1 L149.5 465.5 L148.8 466.8 L148.5 477.8 L148.1 478.8 L147.1 479.6 L145.4 480.0 L138.9 479.8 L137.4 479.2 L136.8 478.4 L136.1 475.1 L136.0 466.4 L134.9 465.2 L133.1 465.1 L132.1 465.8 L131.6 467.2 L131.6 477.5 L131.1 478.9 L130.2 479.6 L129.5 479.9 L122.8 480.0 L121.6 479.6 L120.9 478.9 L120.8 474.9 L120.4 472.8 L119.5 470.6 L118.4 468.9 L117.0 467.5 L114.9 466.2 L112.9 465.5 L109.9 465.0 L105.9 465.1 L104.8 465.9 L104.4 466.6 L103.8 470.8 L103.5 478.6 L102.8 479.5 L101.8 479.9 L98.2 479.8 L97.2 479.0 L96.8 477.2 L96.8 452.8 L96.4 451.6 L95.1 450.9 L94.2 450.9 L93.4 451.2Z M109.5 468.4 L111.5 468.2 L113.0 468.8 L115.1 470.6 L115.9 472.0 L116.4 473.9 L116.2 477.0 L115.6 478.6 L114.4 479.8 L110.2 479.9 L109.2 479.5 L108.5 478.5 L108.1 476.5 L108.2 470.1 L108.6 469.1Z M234.9 30.6 L229.8 30.8 L228.9 31.4 L228.4 32.9 L228.2 67.8 L228.8 69.2 L229.8 69.9 L237.8 70.9 L248.5 73.4 L253.8 75.1 L261.4 78.4 L270.1 83.4 L274.5 86.6 L279.2 90.8 L284.4 96.1 L288.1 100.9 L292.8 108.0 L296.5 115.5 L299.0 122.4 L301.0 129.8 L301.8 133.5 L302.4 139.6 L302.4 150.5 L301.5 159.1 L299.1 168.5 L296.4 175.9 L293.0 182.4 L288.4 189.1 L284.6 193.6 L280.0 198.1 L273.2 203.6 L267.5 207.2 L262.6 209.9 L255.9 212.9 L247.2 215.8 L241.4 217.2 L233.9 218.4 L230.1 218.6 L229.1 219.0 L228.5 219.6 L228.1 220.8 L228.1 254.5 L228.4 255.5 L228.9 256.2 L230.5 256.8 L240.8 256.1 L250.6 254.4 L262.1 251.4 L272.2 247.8 L274.1 246.8 L278.1 245.2 L287.8 240.4 L299.1 233.0 L303.1 231.0 L310.1 224.9 L317.5 217.0 L320.0 214.0 L324.8 207.5 L328.6 201.1 L330.6 197.4 L334.5 188.8 L337.1 181.2 L337.9 177.8 L338.8 175.2 L339.1 172.6 L340.5 166.8 L341.8 157.6 L342.2 147.6 L342.2 140.2 L341.9 133.9 L340.5 122.6 L338.5 113.6 L335.6 104.4 L332.0 95.6 L328.1 88.2 L322.8 79.8 L316.5 71.8 L307.9 62.8 L300.9 56.9 L289.2 48.8 L279.8 43.4 L277.2 42.4 L272.1 39.8 L264.5 36.8 L255.0 33.8 L245.8 31.8 L241.8 31.1Z M350.4 6.9 L349.2 6.8 L348.8 7.2 L348.5 8.2 L348.5 63.5 L348.8 64.6 L349.4 65.9 L351.8 69.5 L354.6 74.6 L360.1 85.8 L361.2 89.1 L362.5 91.6 L365.6 100.8 L368.1 110.0 L370.4 121.1 L371.8 132.5 L372.0 136.8 L372.0 151.2 L371.1 162.4 L369.8 171.1 L368.2 177.1 L367.9 179.5 L365.9 186.6 L362.6 196.5 L358.9 205.6 L353.0 217.1 L347.2 226.1 L343.9 230.8 L340.4 234.1 L337.4 238.0 L330.4 245.9 L323.0 253.0 L318.5 256.8 L307.5 265.0 L301.8 268.8 L295.0 272.8 L280.0 279.8 L270.1 283.2 L258.1 286.5 L249.4 288.2 L241.5 289.4 L225.9 290.1 L222.5 290.1 L212.6 289.4 L209.1 289.4 L197.8 287.6 L187.4 285.2 L170.9 279.9 L164.6 277.2 L162.2 276.0 L161.2 275.9 L160.8 276.1 L160.2 277.1 L160.1 278.1 L160.1 315.5 L160.5 317.0 L161.6 318.1 L167.2 320.1 L179.2 323.5 L182.8 324.1 L190.2 326.0 L194.1 326.5 L197.2 327.2 L211.8 328.8 L221.9 329.2 L230.4 329.2 L246.2 328.1 L261.9 325.8 L280.0 321.1 L291.9 317.1 L297.0 315.0 L307.2 310.2 L316.0 305.8 L321.0 302.9 L331.0 296.4 L335.6 293.0 L344.2 286.2 L350.5 280.9 L361.9 269.5 L371.4 258.4 L374.9 253.9 L377.0 250.5 L380.8 245.4 L387.6 233.9 L389.4 231.5 L391.8 227.2 L394.9 220.6 L400.8 205.9 L402.6 200.2 L405.2 191.1 L407.6 181.0 L408.0 177.6 L409.0 173.6 L410.4 162.6 L410.9 156.6 L411.1 139.5 L410.9 132.4 L410.0 121.8 L409.4 118.9 L408.6 113.0 L406.6 103.1 L404.6 95.1 L401.8 86.4 L400.9 82.9 L394.5 67.1 L389.5 56.9 L381.0 42.6 L376.1 35.5 L371.8 29.6 L362.8 19.0 L353.8 9.9Z"/></svg></div>
+    <!-- شارة الفعالية: نص وأيقونة بسيطة بدل شعار رسمي غير متوفر -->
+    <div class="event-badge" id="eventBadge">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21c-4.5-3-8-6.2-8-10.2A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 8 2.8c0 4-3.5 7.2-8 10.2z"/><path d="M12 8v6"/></svg>
+      <span id="eventLine">بمناسبة اليوم العالمي للصحة النفسية</span>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ================= 1) الصفحة الافتتاحية ================= -->
+    <section class="screen" id="s-home">
+      <div class="hero">
+        <div class="hero-text">
+          <span class="eyebrow">تجربة تفاعلية قصيرة · نحو 3 دقائق لكل مسار</span>
+          <h1>قراراتك <em>تصنع</em> قصتك</h1>
+          <p class="lead">اختر مسارًا، وعِش أربعة مواقف قصيرة، واكتشف كيف تميل إلى التعامل مع الضغوط والمواقف اليومية.</p>
+          <ul class="facts">
+            <li><b>3</b> مسارات</li>
+            <li><b>4</b> مواقف لكل مسار</li>
+            <li>لا نطلب أي بيانات شخصية</li>
+          </ul>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <!-- رسم مسار يتفرع إلى ثلاثة: فكرة "القرار يصنع الطريق" -->
+          <svg viewBox="0 0 300 260">
+            <path class="p trunk draw" d="M150 250 V160"/>
+            <path class="p p1 draw d2" d="M150 160 C150 110 70 110 60 40"/>
+            <path class="p p2 draw d2" d="M150 160 V30"/>
+            <path class="p p3 draw d3" d="M150 160 C150 110 230 110 240 40"/>
+            <circle class="dot" cx="150" cy="160" r="12" style="fill:var(--ink)"/>
+            <circle class="dot" cx="60" cy="40" r="13" style="fill:var(--green)"/>
+            <circle class="dot" cx="150" cy="30" r="13" style="fill:var(--teal)"/>
+            <circle class="dot" cx="240" cy="40" r="13" style="fill:var(--lav)"/>
+          </svg>
+        </div>
+      </div>
+      <div class="notice" role="note">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>
+        <p><b>تنويه:</b> هذه تجربة توعوية وانعكاسية، وليست أداة تشخيص أو تقييم سريري، ولا تغني عن استشارة المختص عند الحاجة.</p>
+      </div>
+      <div><button class="btn btn-primary btn-lg" data-go="paths">ابدأ التجربة</button></div>
+    </section>
+
+    <!-- ================= 2) اختيار المسار ================= -->
+    <section class="screen" id="s-paths" hidden>
+      <div class="section-head">
+        <h2>اختر مسارك</h2>
+        <p>كل مسار قصة مستقلة من أربعة مواقف. لا توجد إجابة صحيحة أو خاطئة، اختر ما ستفعله فعلًا.</p>
+      </div>
+      <div class="paths" id="pathCards"></div>
+      <div class="overall-cta" id="overallCta" hidden>
+        <p>أكملت أكثر من مسار، ويمكنك الآن رؤية ملخص يقارن اختياراتك عبر السياقات.</p>
+        <button class="btn btn-primary" data-go="overall">اعرض الملخص العام</button>
+      </div>
+      <div><button class="btn btn-ghost" data-go="home">العودة للرئيسية</button></div>
+    </section>
+
+    <!-- ================= 3) الموقف ================= -->
+    <section class="screen" id="s-scene" hidden>
+      <div class="scene-top">
+        <div class="scene-meta">
+          <span class="path-chip" id="scPath"></span>
+          <span id="scCount"></span>
+        </div>
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progressWrap"><span id="progress"></span></div>
+      </div>
+      <article class="scene-card">
+        <span class="bridge" id="scBridge" hidden></span>
+        <h2 id="scTitle"></h2>
+        <p class="situation" id="scText"></p>
+        <div class="options" id="scOptions"></div>
+        <div class="feedback" id="scFeedback" aria-live="polite" hidden>
+          <span class="fb-label">أثر قرارك على القصة</span>
+          <p class="fb-outcome" id="fbOutcome"></p>
+          <div class="fb-reflect">
+            <span class="axis-chip" id="fbAxis"></span>
+            <p id="fbReflect"></p>
+          </div>
+          <button class="btn btn-primary" id="btnNext">التالي</button>
+        </div>
+      </article>
+    </section>
+
+    <!-- ================= 4) نتيجة المسار ================= -->
+    <section class="screen" id="s-result" hidden>
+      <div id="resultMount"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" data-go="paths">جرّب مسارًا آخر</button>
+        <button class="btn btn-ghost" id="btnSaveImg">حفظ البطاقة كصورة</button>
+        <button class="btn btn-ghost" id="btnToOverall" data-go="overall" hidden>الملخص العام</button>
+        <button class="btn btn-ghost" data-go="home">العودة للرئيسية</button>
+      </div>
+    </section>
+
+    <!-- ================= 5) الملخص العام ================= -->
+    <section class="screen" id="s-overall" hidden>
+      <div id="overallMount"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" data-go="paths">جرّب مسارًا آخر</button>
+        <button class="btn btn-ghost" id="btnSaveOverall">حفظ الملخص كصورة</button>
+        <button class="btn btn-ghost" data-go="home">العودة للرئيسية</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>تجربة توعوية وانعكاسية وليست أداة تشخيص · لا تُحفظ أي بيانات</span>
+    <button class="linkbtn" id="btnReset">زائر جديد (مسح التجربة)</button>
+  </footer>
+</div>
+
+<!-- نافذة صورة البطاقة -->
+<div class="modal" id="imgModal" hidden dir="rtl" lang="ar">
+  <div class="modal-box">
+    <img id="imgOut" alt="بطاقة نتيجتك في تجربة قراراتك تصنع قصتك">
+    <p>اضغط مطولًا على الصورة لحفظها في جهازك، أو التقط صورة للشاشة.</p>
+    <button class="btn btn-primary" id="btnCloseImg">إغلاق</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   1) الإعدادات — عدّل هنا
+   ========================================================= */
+const CONFIG = {
+  clubLogoSrc: '',   // الشعار مضمّن الآن كـ SVG في الترويسة؛ املأ هذا فقط إن أردت استبداله بصورة
+  eventLogoSrc: '',  // اتركه فارغًا ما لم يتوفر شعار رسمي معتمد للفعالية
+  clubName: 'نادي المؤسس',
+  eventLine: 'بمناسبة اليوم العالمي للصحة النفسية',
+  idleResetSeconds: 150 // عودة تلقائية للرئيسية ومسح التجربة بعد عدم التفاعل (0 للإيقاف) — مفيد في البوث
+};
+
+/* =========================================================
+   2) محاور التحليل الخمسة
+   P إدارة الضغط · E تنظيم المشاعر · S التواصل وطلب الدعم
+   A المرونة والتكيف · B الحدود الصحية
+   ========================================================= */
+const AXES = {
+  P: { name:'إدارة الضغط',
+       short:'تنظيم الموقف وترتيب الأولويات',
+       summary:'في هذا النوع من المواقف، تميل إلى التوقف وتنظيم الموقف وترتيب أولوياتك قبل اتخاذ القرار.',
+       strengths:['ترتيب الأولويات تحت الضغط','تحويل المهام الكبيرة إلى خطوات واضحة'],
+       grow:'قد يفيدك أن تمنح نفسك دقيقة لترتيب الأولويات قبل الانطلاق في التنفيذ.',
+       tip:'اكتب أهم ثلاث مهام في يومك، وابدأ بواحدة فقط حتى تنهيها.' },
+  E: { name:'تنظيم المشاعر',
+       short:'تهدئة المشاعر قبل الاستجابة',
+       summary:'تبدو ميّالًا إلى ملاحظة مشاعرك وتهدئة نفسك قبل أن تستجيب للموقف.',
+       strengths:['الوعي بمشاعرك في اللحظة','التمهل قبل ردود الفعل'],
+       grow:'عند التوتر، قد تستفيد من منح نفسك لحظة قصيرة للتهدئة قبل الاستجابة.',
+       tip:'قبل الرد في موقف مشحون، جرّب تنفّسًا هادئًا: شهيق 4 ثوانٍ، ثم زفير 6 ثوانٍ، ثلاث مرات.' },
+  S: { name:'التواصل وطلب الدعم',
+       short:'التواصل وطلب التوضيح أو الدعم',
+       summary:'من اختياراتك في هذا المسار، ظهر لديك ميل إلى التواصل وطلب التوضيح أو الدعم عند الحاجة.',
+       strengths:['التواصل الواضح والمباشر','الاستفادة من دعم الآخرين وتقديمه لهم'],
+       grow:'قد يساعدك أن تجرّب مشاركة ما تمر به مع شخص تثق به بدل حمله وحدك.',
+       tip:'حدّد شخصًا واحدًا تثق به يمكنك التحدث إليه عندما يزداد الضغط.' },
+  A: { name:'المرونة والتكيف',
+       short:'التكيف والبحث عن بدائل',
+       summary:'تبدو ميّالًا إلى التكيف مع التغيير والبحث عن بدائل عندما لا تسير الأمور كما خططت.',
+       strengths:['المرونة أمام التغيير','رؤية الفرص في المواقف غير المتوقعة'],
+       grow:'قد يفيدك أن تفكّر في خيار بديل ثانٍ عندما تتعطل خطتك الأولى.',
+       tip:'عندما تتغير الخطة، اسأل نفسك: ما الخيار البديل؟ وما الفرصة الصغيرة هنا؟' },
+  B: { name:'الحدود الصحية',
+       short:'حماية وقتك وطاقتك',
+       summary:'يبدو أنك تعطي أهمية لحماية وقتك وطاقتك ووضع حدود واضحة بلطف.',
+       strengths:['وضع حدود واضحة دون خسارة العلاقة','حماية وقت الراحة والطاقة'],
+       grow:'قد يساعدك أن تلاحظ متى تحتاج إلى قول «لا» بلطف أو طلب وقت إضافي قبل الالتزام.',
+       tip:'جرّب عبارة: «دعني أراجع وقتي وأرد عليك» قبل الموافقة على أي طلب جديد.' }
+};
+const AXIS_ORDER = ['P','E','S','A','B'];
+
+/* =========================================================
+   3) المسارات والمواقف
+   كل خيار: t نص الخيار · ax المحاور ووزنها · out أثره على القصة
+   ref انعكاس محايد · echo سطر يظهر في بداية الموقف التالي (التفرع الخفيف)
+   end (في الموقف الأخير فقط) خاتمة القصة على بطاقة النتيجة
+   ========================================================= */
+const PATHS = [
+{
+  id:'work', title:'تحت ضغط العمل', tone:'green',
+  desc:'مهام متراكمة، ووقت ضيق، وتوازن بين العمل وحياتك.',
+  icon:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12.5h18"/></svg>',
+  scenes:[
+    { title:'صباح مزدحم',
+      text:'تصل إلى العمل فتجد ثلاث مهام عاجلة من جهات مختلفة، وكلها مطلوبة اليوم.',
+      opts:[
+        { t:'أرتّب المهام حسب الأهمية وأبدأ بالأكثر تأثيرًا.', ax:{P:2,A:1},
+          out:'بدأت بقائمة واضحة، فصار اليوم أقل فوضى رغم ضغطه.',
+          ref:'ترتيب الأولويات يحوّل الضغط من كتلة واحدة إلى خطوات.',
+          echo:'بعد أن رتّبت مهامك صباحًا،' },
+        { t:'أسأل مديري: أيّ المهام أهم فعلًا؟', ax:{S:2,P:1},
+          out:'اتضح أن إحدى المهام يمكن تأجيلها إلى الغد.',
+          ref:'طلب التوضيح يقلل التخمين ويوفر الجهد.',
+          echo:'بعد أن اتضحت الأولويات مع مديرك،' },
+        { t:'أبدأ فورًا بالأقرب وأنجز ما أستطيع.', ax:{A:2,P:1},
+          out:'أنجزت الكثير بسرعة، لكن ما زال أمامك عمل كثير.',
+          ref:'البدء السريع يكسر التردد، ويحتاج وقفة مراجعة لاحقًا.',
+          echo:'بعد بداية سريعة مليئة بالحركة،' }
+      ]},
+    { title:'طلب إضافي',
+      text:'يطلب منك زميل مساعدته في عرض تقديمي قبل نهاية اليوم.',
+      opts:[
+        { t:'أعتذر بلطف وأقترح وقتًا آخر.', ax:{B:2,S:1},
+          out:'تفهّم زميلك، واتفقتما على صباح الغد.',
+          ref:'قول «لا» بلطف يحمي وقتك دون أن يخسر العلاقة.',
+          echo:'بعد أن حدّدت وقتك بوضوح،' },
+        { t:'أساعده في الجزء الأصعب فقط ثم أعود لمهامي.', ax:{A:2,S:1},
+          out:'ساعدته فيما يهم، وعدت لمهامك متأخرًا قليلًا.',
+          ref:'الحلول الوسط تحتاج مرونة وتقديرًا دقيقًا للوقت.',
+          echo:'بعد أن وازنت بين مهامك ومساعدة زميلك،' },
+        { t:'أوافق، فلا أحب أن أردّ طلبًا لزميل.', ax:{S:2},
+          out:'سعد زميلك كثيرًا، لكن مهامك امتدت إلى المساء.',
+          ref:'الحرص على الآخرين قيمة جميلة، وتحتاج توازنًا مع طاقتك.',
+          echo:'بعد يوم طويل امتد بسبب مساعدة زميلك،' }
+      ]},
+    { title:'رسالة متأخرة',
+      text:'تصلك في التاسعة مساءً رسالة عمل: «هل يمكن إنهاء هذا الليلة؟»',
+      opts:[
+        { t:'أرد بأنني سأتابعه أول الصباح.', ax:{B:2,P:1},
+          out:'أغلقت حاسوبك، وبدأت صباحك بذهن أصفى.',
+          ref:'الفصل بين وقت الراحة ووقت العمل يحمي طاقتك على المدى الطويل.',
+          echo:'بعد ليلة هادئة بعيدًا عن العمل،' },
+        { t:'أنجز الجزء العاجل فقط وأؤجل الباقي.', ax:{P:2,A:1},
+          out:'أنهيت المهم في نصف ساعة، ونمت في وقت معقول.',
+          ref:'فرز العاجل من غير العاجل يخفف ضغط اللحظة.',
+          echo:'بعد أن أنهيت الجزء العاجل ليلًا،' },
+        { t:'أسهر حتى أنهيه، فلن أرتاح وهو معلّق.', ax:{P:1,E:1},
+          out:'أنهيته وارتاح بالك، لكنك استيقظت مرهقًا.',
+          ref:'إنهاء المهمة يريحك ذهنيًا، والنوم الكافي جزء من الإنجاز أيضًا.',
+          echo:'بعد ليلة قصيرة من النوم،' }
+      ]},
+    { title:'إشارة إرهاق',
+      text:'في نهاية الأسبوع تلاحظ أنك متوتر وتنفعل لأسباب بسيطة.',
+      opts:[
+        { t:'آخذ استراحة قصيرة وأمارس شيئًا يريحني.', ax:{E:2,B:1},
+          out:'عدت بطاقة أفضل ونظرة أهدأ للأسبوع القادم.',
+          ref:'ملاحظة التوتر مبكرًا والتوقف لأجله مهارة مهمة.',
+          end:'أنهيت الأسبوع وقد منحت نفسك وقتًا للراحة قبل أن يكبر الإرهاق.' },
+        { t:'أتحدث مع شخص أثق به عن ضغط العمل.', ax:{S:2,E:1},
+          out:'شعرت بخفة بعد الحديث، وخرجت بفكرة جديدة.',
+          ref:'مشاركة الضغط مع شخص موثوق تخفف حمله.',
+          end:'أنهيت الأسبوع وقد شاركت ما تحمله مع من تثق به.' },
+        { t:'أراجع جدولي وأعيد توزيع المهام.', ax:{A:2,P:1},
+          out:'صارت خطة الأسبوع القادم أكثر واقعية.',
+          ref:'تعديل الخطة عند الحاجة علامة مرونة، لا تراجع.',
+          end:'أنهيت الأسبوع بخطة أخف وأوضح للأسبوع القادم.' }
+      ]}
+  ]
+},
+{
+  id:'people', title:'بينك وبين الآخرين', tone:'teal',
+  desc:'صداقة، وسوء فهم، وحدود، وطرق مختلفة لدعم من حولك.',
+  icon:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8" r="3.2"/><circle cx="16.5" cy="9.5" r="2.6"/><path d="M3 19.5c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.6-.2 1.3-.3 2-.3 2.3 0 4 1.5 4.5 4.2"/></svg>',
+  scenes:[
+    { title:'صديق صامت',
+      text:'صديقك المقرّب على غير عادته منذ أيام: قليل الكلام ويعتذر عن اللقاءات.',
+      opts:[
+        { t:'أرسل له: «لاحظت أنك لست كعادتك، وأنا هنا إن احتجتني».', ax:{S:2,E:1},
+          out:'رد بعد ساعات: «شكرًا، أحتاج وقتًا فقط».',
+          ref:'التعبير عن الاهتمام دون ضغط يفتح بابًا للحديث.',
+          echo:'بعد رسالتك الهادئة له،' },
+        { t:'أدعوه لنشاط نحبه دون أن أسأله عن شيء.', ax:{A:2,S:1},
+          out:'وافق، وضحك لأول مرة منذ أيام.',
+          ref:'أحيانًا يكون الحضور أبلغ من الأسئلة.',
+          echo:'بعد خروجكما معًا،' },
+        { t:'أمنحه مساحته وأنتظر أن يبادر هو.', ax:{B:2,E:1},
+          out:'مرّت أيام، ثم اتصل بك من تلقاء نفسه.',
+          ref:'احترام مساحة الآخرين شكل من أشكال الدعم.',
+          echo:'بعد أن منحته مساحته،' }
+      ]},
+    { title:'حين يتكلم',
+      text:'يخبرك أخيرًا أنه يمر بضغط عائلي ولا يعرف ماذا يفعل.',
+      opts:[
+        { t:'أستمع إليه دون مقاطعة حتى ينتهي.', ax:{E:2,S:1},
+          out:'قال في النهاية: «لم أتوقع أن الكلام سيريحني هكذا».',
+          ref:'الاستماع الهادئ يتطلب ضبط رغبتنا في التدخل السريع.',
+          echo:'بعد أن استمعت له طويلًا،' },
+        { t:'أقترح عليه حلولًا عملية مباشرة.', ax:{P:2},
+          out:'أخذ فكرة منها، لكنه بدا متعبًا من كثرة الاقتراحات.',
+          ref:'الحلول مفيدة، وتصل أفضل بعد أن يشعر الآخر بأنه مسموع.',
+          echo:'بعد أن قدّمت له بعض الحلول،' },
+        { t:'أشاركه تجربة مشابهة مررت بها.', ax:{S:2,A:1},
+          out:'شعر أنه ليس وحده، وانفتح أكثر.',
+          ref:'المشاركة الشخصية تقرّب، ما دام التركيز باقيًا على تجربته هو.',
+          echo:'بعد أن تبادلتما التجارب،' }
+      ]},
+    { title:'كلام وصلك',
+      text:'يصلك أن زميلًا قال عنك كلامًا أزعجك في مجموعة محادثة.',
+      opts:[
+        { t:'أكلّمه على انفراد وأسأله عن قصده.', ax:{S:2,E:1},
+          out:'اتضح أن كلامه نُقل ناقصًا، واعتذر عن صياغته.',
+          ref:'السؤال المباشر الهادئ يقطع الطريق على التخمين.',
+          echo:'بعد أن اتضح سوء الفهم،' },
+        { t:'أنتظر حتى أهدأ ثم أقرر ماذا أفعل.', ax:{E:2,P:1},
+          out:'بعد يوم، بدا الأمر أصغر مما ظننت.',
+          ref:'تأجيل الرد حتى تهدأ يمنع قرارات قد تندم عليها.',
+          echo:'بعد أن منحت نفسك وقتًا لتهدأ،' },
+        { t:'أرد في المجموعة وأوضّح موقفي.', ax:{B:2},
+          out:'توقف الكلام، لكن الجو أصبح متوترًا قليلًا.',
+          ref:'الدفاع عن نفسك حق، واختيار المكان المناسب يغيّر أثر الرسالة.',
+          echo:'بعد أن أوضحت موقفك أمام الجميع،' }
+      ]},
+    { title:'طلب كبير',
+      text:'يطلب منك قريب أن تتولى عنه مسؤولية كبيرة لأسبوعين، ووقتك مزدحم أصلًا.',
+      opts:[
+        { t:'أشرح ظروفي وأعرض مساعدة أصغر.', ax:{B:2,S:1},
+          out:'قدّر صراحتك، ووجد من يساعده في الباقي.',
+          ref:'الحدود الواضحة تجعل العطاء ممكنًا دون استنزاف.',
+          end:'خرجت من القصة وعلاقاتك قائمة على الوضوح وحدود تحفظ طاقتك.' },
+        { t:'أوافق وأعيد ترتيب أسبوعي.', ax:{A:2,S:1},
+          out:'كان أسبوعًا مزدحمًا، لكنك تجاوزته.',
+          ref:'التكيف مع ظروف الآخرين قوة، تحتاج مراقبة حدود طاقتك.',
+          end:'خرجت من القصة وقد وقفت إلى جانب من حولك رغم ازدحام وقتك.' },
+        { t:'أطلب يومًا للتفكير قبل أن أرد.', ax:{P:2,E:1},
+          out:'عدت برد واضح ومريح لكما.',
+          ref:'التمهل قبل الالتزام يجعل القرار أكثر واقعية.',
+          end:'خرجت من القصة وقد اتخذت قراراتك بتمهّل ووضوح.' }
+      ]}
+  ]
+},
+{
+  id:'whatif', title:'ماذا لو؟', tone:'lav',
+  desc:'رحلة غير متوقعة: خطط تتغير، ومفاجآت، وقرارات تحت عدم اليقين.',
+  icon:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
+  scenes:[
+    { title:'رحلة لم تبدأ',
+      text:'وصلت إلى المطار لرحلة مهمة، فظهر على الشاشة: «أُلغيت الرحلة». الطابور طويل والجميع متوتر.',
+      opts:[
+        { t:'أتنفس بعمق وأقرأ الخيارات المتاحة بهدوء.', ax:{E:2,P:1},
+          out:'لاحظت لوحة صغيرة تدلّ على حجز بديل عبر التطبيق.',
+          ref:'تهدئة النفس أولًا تجعل الخيارات أوضح.',
+          echo:'بعد أن هدأت وحجزت بديلًا عبر التطبيق،' },
+        { t:'أقف في الطابور وأسأل الموظف مباشرة.', ax:{S:2,P:1},
+          out:'بعد انتظار، حصلت على مقعد في رحلة مسائية.',
+          ref:'التوجه لمن يملك المعلومة طريق مباشر للحل.',
+          echo:'بعد أن حصلت على مقعد في رحلة مسائية،' },
+        { t:'أبحث عن طريق آخر: قطار أو سيارة.', ax:{A:2},
+          out:'وجدت قطارًا يغادر بعد ساعة.',
+          ref:'البحث عن بدائل غير متوقعة من علامات المرونة.',
+          echo:'بعد أن غيّرت خطتك وركبت القطار،' }
+      ]},
+    { title:'مدينة بلا إشارة',
+      text:'تصل إلى مدينة جديدة، فينطفئ هاتفك تمامًا. لا خرائط ولا اتصال، والليل يقترب.',
+      opts:[
+        { t:'أدخل أقرب متجر وأطلب المساعدة.', ax:{S:2},
+          out:'أعارك صاحب المتجر شاحنًا وأرشدك إلى الفندق.',
+          ref:'طلب المساعدة من مصدر آمن خطوة ذكية، لا ضعف.',
+          echo:'بعد أن ساعدك صاحب المتجر،' },
+        { t:'أتوقف لحظة وأتذكر ما أعرفه عن العنوان.', ax:{P:2,E:1},
+          out:'تذكّرت اسم الشارع، ووصلت بعد مشي قصير.',
+          ref:'التفكير المنظم تحت الضغط يكشف موارد لم تنتبه لها.',
+          echo:'بعد أن وجدت طريقك بنفسك،' },
+        { t:'أعتبرها مغامرة وأمشي نحو وسط المدينة.', ax:{A:2,E:1},
+          out:'اكتشفت سوقًا ليليًا جميلًا، ثم وجدت فندقك.',
+          ref:'النظر إلى الموقف كفرصة يخفف وقع المفاجأة.',
+          echo:'بعد جولتك غير المخطط لها،' }
+      ]},
+    { title:'تغيير مفاجئ',
+      text:'تصلك رسالة: الاجتماع الذي جئت من أجله تأجّل أسبوعًا كاملًا.',
+      opts:[
+        { t:'أشعر بالإحباط، فأمنح نفسي وقتًا قبل أي قرار.', ax:{E:2,B:1},
+          out:'بعد ساعة، رأيت الأمر بصورة أهدأ.',
+          ref:'الاعتراف بالمشاعر قبل التصرف يجعل القرار أصدق.',
+          echo:'بعد أن هدأ إحباطك،' },
+        { t:'أتواصل مع المنظمين لأفهم الخيارات.', ax:{S:2,P:1},
+          out:'عرضوا عليك حضور الاجتماع عن بُعد.',
+          ref:'السؤال الواضح يحوّل الغموض إلى خيارات.',
+          echo:'بعد أن رتّبت حضور الاجتماع عن بُعد،' },
+        { t:'أعيد تخطيط أسبوعي لأستفيد من وجودي هنا.', ax:{A:2,P:1},
+          out:'رتّبت لقاءات جانبية مفيدة لم تكن في الحسبان.',
+          ref:'إعادة صياغة الخطة تحوّل التغيير إلى فرصة.',
+          echo:'بعد أن أعدت تخطيط أسبوعك،' }
+      ]},
+    { title:'باب لم تتوقعه',
+      text:'في يومك الأخير، تُعرض عليك فرصة عمل في هذه المدينة، وعليك الرد خلال 48 ساعة.',
+      opts:[
+        { t:'أكتب الإيجابيات والسلبيات قبل أن أقرر.', ax:{P:2,E:1},
+          out:'اتضحت الصورة، واتخذت قرارك بثقة.',
+          ref:'التفكير قبل التصرف يوازن بين الحماس والحذر.',
+          end:'عدت من رحلتك بقرار مدروس، رغم أن شيئًا فيها لم يسر كما خططت.' },
+        { t:'أستشير شخصين أثق برأيهما.', ax:{S:2,A:1},
+          out:'منحاك زوايا لم تخطر لك.',
+          ref:'استشارة الموثوقين توسّع الرؤية دون أن تسلبك القرار.',
+          end:'عدت من رحلتك وقد عرفت أن حولك من يمكنك الرجوع إليه.' },
+        { t:'أطلب وقتًا إضافيًا لأفكر دون ضغط.', ax:{B:2,E:1},
+          out:'وافقوا، واتخذت قرارك بهدوء.',
+          ref:'طلب الوقت الذي تحتاجه حدّ صحي في القرارات الكبيرة.',
+          end:'عدت من رحلتك وقد منحت نفسك الوقت الذي يستحقه قرار كبير.' }
+      ]}
+  ]
+}
+];
+
+/* =========================================================
+   4) الحالة (في الذاكرة فقط — لا تخزين ولا إرسال لأي بيانات)
+   ========================================================= */
+const state = { path:null, idx:0, choices:[], answered:false, completed:{}, lastResult:null };
+const $ = (id) => document.getElementById(id);
+const LETTERS = ['أ','ب','ج'];
+
+/* ---------- تنقل بين الشاشات ---------- */
+function show(name){
+  ['home','paths','scene','result','overall'].forEach(n => { $('s-'+n).hidden = (n !== name); });
+  const el = $('s-'+name);
+  el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter');
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(name==='paths') renderPaths();
+  if(name==='overall') renderOverall();
+}
+document.addEventListener('click', (e) => {
+  const go = e.target.closest('[data-go]');
+  if(go) show(go.dataset.go);
+});
+
+/* ---------- شاشة المسارات ---------- */
+function renderPaths(){
+  $('pathCards').innerHTML = PATHS.map(p => `
+    <button class="path-card" data-tone="${p.tone}" data-path="${p.id}">
+      ${state.completed[p.id] ? '<span class="done-chip">مكتمل</span>' : ''}
+      <span class="path-icon" aria-hidden="true">${p.icon}</span>
+      <h3>${p.title}</h3>
+      <p>${p.desc}</p>
+      <span class="go">${state.completed[p.id] ? 'أعد المسار' : 'ابدأ'} <span aria-hidden="true">←</span></span>
+    </button>`).join('');
+  $('pathCards').querySelectorAll('[data-path]').forEach(b => b.onclick = () => startPath(b.dataset.path));
+  $('overallCta').hidden = Object.keys(state.completed).length < 2;
+}
+
+function startPath(id){
+  state.path = PATHS.find(p => p.id === id);
+  state.idx = 0; state.choices = []; state.answered = false;
+  show('scene'); renderScene();
+}
+
+/* ---------- الموقف ---------- */
+function renderScene(){
+  const p = state.path, sc = p.scenes[state.idx], n = p.scenes.length;
+  $('scPath').textContent = p.title;
+  $('scCount').textContent = `الموقف ${state.idx+1} من ${n}`;
+  setProgress();
+  // التفرع الخفيف: سطر يتغير حسب الاختيار السابق
+  if(state.idx > 0){
+    const prev = p.scenes[state.idx-1].opts[state.choices[state.idx-1]];
+    $('scBridge').textContent = prev.echo; $('scBridge').hidden = false;
+  } else $('scBridge').hidden = true;
+  $('scTitle').textContent = sc.title;
+  $('scText').textContent = sc.text;
+  $('scOptions').innerHTML = sc.opts.map((o,i) =>
+    `<button class="opt" data-i="${i}"><span class="k">${LETTERS[i]}</span><span>${o.t}</span></button>`).join('');
+  $('scOptions').querySelectorAll('.opt').forEach(b => b.onclick = () => choose(+b.dataset.i));
+  $('scFeedback').hidden = true;
+  const card = document.querySelector('.scene-card');
+  card.classList.remove('enter'); void card.offsetWidth; card.classList.add('enter');
+}
+
+function setProgress(){
+  const n = state.path.scenes.length;
+  const pct = Math.round(((state.idx + (state.answered?1:0)) / n) * 100);
+  $('progress').style.width = pct + '%';
+  $('progressWrap').setAttribute('aria-valuenow', pct);
+}
+
+// المحور الأساسي للخيار = الأعلى وزنًا
+const primaryAxis = (ax) => Object.entries(ax).sort((a,b)=>b[1]-a[1])[0][0];
+
+function choose(i){
+  if(state.answered) return;
+  state.answered = true; state.choices[state.idx] = i;
+  const o = state.path.scenes[state.idx].opts[i];
+  $('scOptions').querySelectorAll('.opt').forEach((b,j) => {
+    b.disabled = true; b.classList.add(j===i ? 'chosen' : 'dim');
+  });
+  $('fbOutcome').textContent = o.out;
+  $('fbAxis').textContent = AXES[primaryAxis(o.ax)].name;
+  $('fbReflect').textContent = o.ref;
+  const last = state.idx === state.path.scenes.length - 1;
+  $('btnNext').textContent = last ? 'اعرض نتيجتي' : 'التالي';
+  const fb = $('scFeedback'); fb.hidden = false;
+  fb.classList.remove('enter'); void fb.offsetWidth; fb.classList.add('enter');
+  setProgress();
+  setTimeout(() => fb.scrollIntoView({behavior:'smooth', block:'nearest'}), 120);
+}
+
+$('btnNext').onclick = () => {
+  if(state.idx < state.path.scenes.length - 1){ state.idx++; state.answered = false; renderScene(); window.scrollTo({top:0,behavior:'smooth'}); }
+  else finishPath();
+};
+
+/* =========================================================
+   5) منطق التحليل
+   - نجمع أوزان المحاور من الخيارات الأربعة
+   - الأعلى = النمط الغالب (الملخص + نقاط القوة)
+   - الثاني = جملة مكمّلة + نقطة قوة ثالثة
+   - الأدنى = نقطة التأمل + الاقتراح العملي
+   ========================================================= */
+function scoreChoices(path, choices){
+  const s = {P:0,E:0,S:0,A:0,B:0};
+  choices.forEach((c,k) => { const ax = path.scenes[k].opts[c].ax; for(const a in ax) s[a] += ax[a]; });
+  return s;
+}
+function rankAxes(s){ return AXIS_ORDER.slice().sort((a,b) => s[b]-s[a] || AXIS_ORDER.indexOf(a)-AXIS_ORDER.indexOf(b)); }
+
+function buildResult(path, choices){
+  const scores = scoreChoices(path, choices);
+  const r = rankAxes(scores);
+  const top = AXES[r[0]], second = AXES[r[1]];
+  const low = r[4], low2 = r[3];
+  const grow = [AXES[low].grow];
+  if(scores[low2] === 0) grow.push(AXES[low2].grow); // نقطة ثانية فقط إذا غاب المحور تمامًا
+  const lastOpt = path.scenes[path.scenes.length-1].opts[choices[choices.length-1]];
+  return {
+    pathId:path.id, pathTitle:path.title, scores, rank:r,
+    summary: top.summary,
+    summary2: `وإلى جانب ذلك، ظهر لديك ميل إلى ${second.short}.`,
+    strengths: [top.strengths[0], top.strengths[1], second.strengths[0]],
+    grow, tip: AXES[low].tip, ending: lastOpt.end
+  };
+}
+
+function finishPath(){
+  state.answered = false;
+  const res = buildResult(state.path, state.choices);
+  state.completed[state.path.id] = res;
+  state.lastResult = res;
+  renderResult(res);
+  show('result');
+}
+
+function barsHTML(scores){
+  const max = Math.max(1, ...Object.values(scores));
+  return AXIS_ORDER.map(a => `
+    <div class="bar"><span>${AXES[a].name}</span>
+      <div class="track"><div class="fill" style="width:${Math.round(scores[a]/max*100)}%"></div></div></div>`).join('');
+}
+
+const DISCLAIMER = 'هذه تجربة توعوية وانعكاسية وليست أداة تشخيص أو تقييم سريري، ولا تغني عن استشارة المختص عند الحاجة.';
+
+function renderResult(r){
+  $('resultMount').innerHTML = `
+  <article class="result-card" id="resultCard">
+    <div class="rc-head"><small>نتيجة مسار</small><h2>${r.pathTitle}</h2></div>
+    <div class="rc-body">
+      <p class="rc-summary">${r.summary}<span>${r.summary2}</span></p>
+      <div class="rc-grid">
+        <div class="rc-block"><h3>نقاط قوة محتملة</h3><ul>${r.strengths.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+        <div class="rc-block reflect"><h3>للتأمل والتطوير</h3><ul>${r.grow.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+      </div>
+      <div class="rc-tip"><b>اقتراح عملي صغير</b><p>${r.tip}</p></div>
+      <div class="bars-wrap">
+        <div class="bars">${barsHTML(r.scores)}</div>
+        <p class="bars-note">توزيع نسبي لاختياراتك في هذا المسار فقط، وليس درجة أو تقييمًا.</p>
+      </div>
+      <p class="rc-ending">${r.ending}</p>
+      <p class="rc-disclaimer">${DISCLAIMER}</p>
+    </div>
+  </article>`;
+  $('btnToOverall').hidden = Object.keys(state.completed).length < 2;
+}
+
+/* ---------- الملخص العام (مسارين فأكثر) ---------- */
+function buildOverall(){
+  const done = PATHS.filter(p => state.completed[p.id]).map(p => state.completed[p.id]);
+  const total = {P:0,E:0,S:0,A:0,B:0};
+  done.forEach(r => { const sum = Object.values(r.scores).reduce((a,b)=>a+b,0) || 1;
+    AXIS_ORDER.forEach(a => total[a] += r.scores[a]/sum); });
+  const rank = rankAxes(total);
+  const tops = done.map(r => r.rank[0]);
+  const same = tops.every(t => t === tops[0]);
+  const text = same
+    ? `يبدو أن ميلك إلى ${AXES[tops[0]].short} ثابت نسبيًا عبر السياقات المختلفة، وهذا أسلوب تعتمد عليه في أكثر من موقف.`
+    : `يتغير أسلوبك بحسب السياق: ${done.map(r => `في «${r.pathTitle}» ظهر ميل إلى ${AXES[r.rank[0]].short}`).join('، و')}. تنوّع الأسلوب بحسب الموقف أمر طبيعي ويعكس قدرة على التكيف.`;
+  return { done, total, rank, text, tip: AXES[rank[4]].tip, grow: AXES[rank[4]].grow };
+}
+function renderOverall(){
+  const o = buildOverall();
+  if(o.done.length < 2){ $('overallMount').innerHTML = '<p>أكمل مسارين على الأقل لرؤية الملخص العام.</p>'; return; }
+  state.lastOverall = o;
+  $('overallMount').innerHTML = `
+  <article class="result-card">
+    <div class="rc-head"><small>الملخص العام</small><h2>أسلوبك عبر ${o.done.length===3?'المسارات الثلاثة':'مسارين'}</h2></div>
+    <div class="rc-body">
+      <p class="rc-summary">${o.text}</p>
+      <div class="overall-rows">${o.done.map(r => `<div class="overall-row"><span>${r.pathTitle}</span><span class="axis-chip">${AXES[r.rank[0]].name}</span></div>`).join('')}</div>
+      <div class="bars-wrap"><div class="bars">${barsHTML(o.total)}</div>
+        <p class="bars-note">توزيع نسبي مجمّع من المسارات التي أكملتها، وليس درجة أو تقييمًا.</p></div>
+      <div class="rc-block reflect"><h3>للتأمل</h3><ul><li>${o.grow}</li></ul></div>
+      <div class="rc-tip"><b>اقتراح عملي صغير</b><p>${o.tip}</p></div>
+      <p class="rc-disclaimer">${DISCLAIMER}</p>
+    </div>
+  </article>`;
+}
+
+/* =========================================================
+   6) حفظ البطاقة كصورة (رسم Canvas يدعم العربية بلا مكتبات)
+   ========================================================= */
+function wrap(ctx, text, maxW){
+  const words = text.split(' '), lines = []; let line = '';
+  for(const w of words){ const t = line ? line+' '+w : w;
+    if(ctx.measureText(t).width > maxW && line){ lines.push(line); line = w; } else line = t; }
+  if(line) lines.push(line); return lines;
+}
+function paintCard(ctx, data, draw){
+  const W = 1080, P = 84, R = W - P, maxW = W - 2*P;
+  const C = {bg:'#F6F5F0', ink:'#1F2A26', muted:'#56635D', green:'#1E5A41', teal:'#1F7A7E', soft:'#E2F0E8', line:'#DCE3DE'};
+  const DF = "'Readex Pro','IBM Plex Sans Arabic',Tahoma,sans-serif", BF = "'IBM Plex Sans Arabic',Tahoma,sans-serif";
+  ctx.direction = 'rtl'; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+  let y = 0;
+  if(draw){
+    ctx.fillStyle = C.bg; ctx.fillRect(0,0,W,ctx.canvas.height);
+    const g = ctx.createLinearGradient(W,0,0,300); g.addColorStop(0,'#1E5A41'); g.addColorStop(1,'#1F7A7E');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,300);
+  }
+  const line = (txt, font, color, lh, x=R, mw=maxW) => {
+    ctx.font = font; const ls = wrap(ctx, txt, mw);
+    ls.forEach(l => { y += lh; if(draw){ ctx.fillStyle = color; ctx.fillText(l, x, y); } });
+  };
+  y = 40;
+  line(CONFIG.eventLine + ' · ' + CONFIG.clubName, `500 28px ${BF}`, 'rgba(255,255,255,.85)', 44);
+  line('قراراتك تصنع قصتك', `700 64px ${DF}`, '#FFFFFF', 92);
+  line(data.head, `600 38px ${BF}`, '#FFFFFF', 60);
+  y = 300 + 30;
+  line(data.summary, `600 38px ${BF}`, C.ink, 60);
+  if(data.summary2) line(data.summary2, `400 32px ${BF}`, C.muted, 52);
+  const section = (title, items, dot) => {
+    y += 30; line(title, `700 32px ${BF}`, C.green, 50);
+    items.forEach(it => {
+      ctx.font = `400 31px ${BF}`; const ls = wrap(ctx, it, maxW-34);
+      ls.forEach((l,k) => { y += 50; if(draw){
+        if(k===0){ ctx.fillStyle = dot; ctx.beginPath(); ctx.arc(R-8, y-11, 7, 0, Math.PI*2); ctx.fill(); }
+        ctx.fillStyle = C.ink; ctx.fillText(l, R-34, y); } });
+    });
+  };
+  if(data.strengths) section('نقاط قوة محتملة', data.strengths, '#2E7D5B');
+  if(data.rows) section('النمط الغالب في كل مسار', data.rows, '#1F7A7E');
+  section('للتأمل والتطوير', data.grow, '#1F7A7E');
+  // صندوق الاقتراح العملي
+  y += 40; const boxTop = y;
+  ctx.font = `400 31px ${BF}`; const tipLines = wrap(ctx, data.tip, maxW-60);
+  const boxH = 50 + 30 + tipLines.length*50 + 10;
+  if(draw){ ctx.fillStyle = C.soft; roundRect(ctx, P, boxTop, maxW, boxH, 24); ctx.fill(); }
+  y += 50; if(draw){ ctx.font = `700 31px ${BF}`; ctx.fillStyle = C.green; ctx.fillText('اقتراح عملي صغير', R-30, y); }
+  y += 10; tipLines.forEach(l => { y += 50; if(draw){ ctx.font = `400 31px ${BF}`; ctx.fillStyle = C.ink; ctx.fillText(l, R-30, y); } });
+  y = boxTop + boxH;
+  if(data.ending){ y += 20; line(data.ending, `400 29px ${BF}`, C.muted, 48); }
+  y += 34; if(draw){ ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(P,y); ctx.lineTo(R,y); ctx.stroke(); }
+  y += 6; line(DISCLAIMER, `400 25px ${BF}`, C.muted, 42);
+  return y + 70;
+}
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+async function saveImage(data, filename){
+  try{ await document.fonts.ready; }catch(e){}
+  const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1600;
+  const ctx = cv.getContext('2d');
+  const h = paintCard(ctx, data, false);   // قياس الارتفاع
+  cv.height = Math.max(1080, Math.ceil(h));
+  paintCard(cv.getContext('2d'), data, true); // الرسم الفعلي
+  const url = cv.toDataURL('image/png');
+  $('imgOut').src = url; $('imgModal').hidden = false;
+  // محاولة تنزيل مباشر (تعمل عند التشغيل المحلي أو الاستضافة العادية)
+  try{ const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); }catch(e){}
+}
+$('btnSaveImg').onclick = () => { const r = state.lastResult; if(!r) return;
+  saveImage({head:'نتيجة مسار: '+r.pathTitle, summary:r.summary, summary2:r.summary2, strengths:r.strengths, grow:r.grow, tip:r.tip, ending:r.ending}, 'qararatak-'+r.pathId+'.png'); };
+$('btnSaveOverall').onclick = () => { const o = state.lastOverall; if(!o) return;
+  saveImage({head:'الملخص العام', summary:o.text, rows:o.done.map(r => r.pathTitle+': '+AXES[r.rank[0]].name), grow:[o.grow], tip:o.tip}, 'qararatak-summary.png'); };
+$('btnCloseImg').onclick = () => { $('imgModal').hidden = true; };
+$('imgModal').onclick = (e) => { if(e.target.id === 'imgModal') $('imgModal').hidden = true; };
+
+/* =========================================================
+   7) إعادة التعيين (زائر جديد) + المؤقت الخامل للبوث
+   ========================================================= */
+function resetAll(){
+  state.path = null; state.idx = 0; state.choices = []; state.answered = false;
+  state.completed = {}; state.lastResult = null; state.lastOverall = null;
+  $('imgModal').hidden = true; show('home');
+}
+$('btnReset').onclick = resetAll;
+let idleT;
+function bumpIdle(){
+  if(!CONFIG.idleResetSeconds) return;
+  clearTimeout(idleT);
+  idleT = setTimeout(() => { if($('s-home').hidden) resetAll(); }, CONFIG.idleResetSeconds*1000);
+}
+['pointerdown','keydown','scroll','touchstart'].forEach(ev => window.addEventListener(ev, bumpIdle, {passive:true}));
+
+/* ---------- تهيئة الشعارات والنصوص من الإعدادات ---------- */
+(function init(){
+  document.documentElement.setAttribute('dir','rtl'); document.documentElement.setAttribute('lang','ar');
+  if(CONFIG.clubLogoSrc){ const s = $('clubLogo'); s.classList.add('has-img');
+    s.innerHTML = `<img src="${CONFIG.clubLogoSrc}" alt="شعار ${CONFIG.clubName}">`; }
+  if(CONFIG.eventLogoSrc){ $('eventBadge').innerHTML = `<img src="${CONFIG.eventLogoSrc}" alt="${CONFIG.eventLine}">`; }
+  else $('eventLine').textContent = CONFIG.eventLine;
+  bumpIdle();
+})();
+</script>
+
+</body></html>
